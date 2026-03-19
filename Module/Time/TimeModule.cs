@@ -34,7 +34,7 @@ namespace DingFrame.Module.Time
 			SetTimeScale(1);
 		}
 		public virtual void GameQuit() => UpdateCollector.Instance.RemoveUpdater(this);
-		public virtual void GameEnterBackground() => isGamePause = true;
+		public virtual void GameEnterBackground() => isGamePause = !UnityEngine.Application.runInBackground;
 		public virtual void GameBackForeground() => isGamePause = false;
 
 

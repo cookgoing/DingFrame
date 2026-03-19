@@ -7,7 +7,6 @@ namespace DingFrame.GameLaunch
 
 	public sealed class GameLauncher : MonoBehaviour
 	{
-		private bool isInitPause = true, isInitFocus = true;
 		public ScriptableObject BusinessEntrance;
 
 
@@ -48,25 +47,17 @@ namespace DingFrame.GameLaunch
 
 		private void OnApplicationPause(bool pauseStatus)
 		{
-			if (isInitPause)
-			{
-				isInitPause = false;
-				return;
-			}
-			if (!pauseStatus) return;
-
-			GameStateListenerCollector.Instance.ForEach(listener => listener.GameEnterBackground());
+		#if UNITY_ANDROID || UNITY_IOS
+			if (pauseStatus) GameStateListenerCollector.Instance.ForEach(listener => listener.GameEnterBackground());
+			else GameStateListenerCollector.Instance.ForEach(listener => listener.GameBackForeground());
+		#endif
 		}
 		private void OnApplicationFocus(bool hasFocus)
 		{
-			if (isInitFocus)
-			{
-				isInitFocus = false;
-				return;
-			}
-			if (!hasFocus) return;
-
-			GameStateListenerCollector.Instance.ForEach(listener => listener.GameBackForeground());
+		#if UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX
+			if (hasFocus) GameStateListenerCollector.Instance.ForEach(listener => listener.GameBackForeground());
+			else GameStateListenerCollector.Instance.ForEach(listener => listener.GameEnterBackground());
+		#endif
 		}
 		private void OnApplicationQuit()
 		{

@@ -99,7 +99,7 @@ namespace DingFrame.Utils
 		public static bool DeleteFile(string filePath)
 		{
 			if (string.IsNullOrEmpty(filePath)) return false;
-			if (!FileUtils.IsPersistentFile(filePath)) return false;
+			if (!IsPersistentFile(filePath)) return false;
 
 			File.Delete(filePath);
 			return true;
