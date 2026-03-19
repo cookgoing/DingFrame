@@ -1,0 +1,18 @@
+{
+    "name": "DingFrame_GameLaunch",
+    "rootNamespace": "",
+    "references": [
+        "GUID:5492cd6dde2eadc45ac6e1540f1a9c3f",
+        "GUID:6357dc40c804a264ea2a88c29e8b273b",
+        "GUID:74b6b2b2e1727024b91b098649debe56"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
