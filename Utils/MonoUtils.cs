@@ -28,7 +28,6 @@ namespace DingFrame.Utils
 
 			return color;
 		}
-
 		public static string Color2Str(Color color) => ColorUtility.ToHtmlStringRGB(color);
 
 

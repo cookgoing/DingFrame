@@ -2,9 +2,9 @@
     "name": "DingFrame_GameLaunch",
     "rootNamespace": "",
     "references": [
-        "GUID:5492cd6dde2eadc45ac6e1540f1a9c3f",
-        "GUID:6357dc40c804a264ea2a88c29e8b273b",
-        "GUID:74b6b2b2e1727024b91b098649debe56"
+        "GUID:e8c8199ef8cc3ee43836179a4af970e4",
+        "GUID:7530c1a4424c01c4db52a0593e092f0f",
+        "GUID:41485ec395cdad041a920962ed4188ec"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

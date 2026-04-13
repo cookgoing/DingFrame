@@ -29,5 +29,7 @@ namespace DingFrame.Order
 		public readonly override int GetHashCode() => HashCode.Combine(MainOrder, SubOrder);
 		public static bool operator ==(Order left, Order right) => left.Equals(right);
     	public static bool operator !=(Order left, Order right) => !left.Equals(right);
+
+		public override string ToString() => $"Order({MainOrder}, {SubOrder})";
 	}
 }

@@ -19,7 +19,6 @@ namespace DingFrame
 		public UpdateCollector() => UpdaterCallers = new SortedSet<IUpdateCaller>(new UpdateComparer());
 
 		public void AddUpdater(IUpdateCaller updater) => UpdaterCallers.Add(updater);
-
 		public bool RemoveUpdater(IUpdateCaller updater) => UpdaterCallers.Remove(updater);
 
 		public void ForEach(Action<IUpdateCaller> action)

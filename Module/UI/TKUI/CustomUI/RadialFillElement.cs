@@ -88,8 +88,8 @@ namespace DingFrame.Module.TKUI
 			set
 			{
 				_angleOffset = value;
-				radialFill.transform.rotation = Quaternion.Euler(0, 0, value);
-				overlayImage.transform.rotation = Quaternion.Euler(0, 0, -value);
+				radialFill.style.rotate = Quaternion.Euler(0, 0, value);
+				overlayImage.style.rotate = Quaternion.Euler(0, 0, -value);
 			}
 		}
 		[UxmlAttribute] public Color fillColor { get; set; } = Color.white;
