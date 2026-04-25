@@ -10,12 +10,8 @@ namespace DingFrame.Module.Time
 		public Order ListenOrder => listenOrder;
 		public Order UpdateOrder => updateOrder;
 		
-		protected bool isGamePause;
-		public double ClientSecD{get; private set;}
-		public float Scale{get; private set;}
-		public float Delt{get; private set;}//s
-		public long ClientSecL => (long)ClientSecD;
-		public long ClientMilliSec => (long)(ClientSecD * 1000);
+		public bool IsGamePause {get; private set;}
+		public GameTimer GameTimer {get; private set;}
 		
 		protected TimeSpan spanInCenterDevice;
 		public long CenterTicks => (DateTime.UtcNow + spanInCenterDevice).Ticks;
@@ -25,33 +21,26 @@ namespace DingFrame.Module.Time
 		public virtual void Init() => GameStateListenerCollector.Instance.AddGameStateListener(this);	
 		public virtual void Dispose() => GameStateListenerCollector.Instance.RemoveGameStateListener(this);
 
-
 		public virtual void GameEnter()
 		{
 			UpdateCollector.Instance.AddUpdater(this);
 
-			ClientSecD = 0;
-			SetTimeScale(1);
+			GameTimer = new(0, 1);
 		}
 		public virtual void GameQuit() => UpdateCollector.Instance.RemoveUpdater(this);
-		public virtual void GameEnterBackground() => isGamePause = !UnityEngine.Application.runInBackground;
-		public virtual void GameBackForeground() => isGamePause = false;
-
+		public virtual void GameEnterBackground() => IsGamePause = !UnityEngine.Application.runInBackground;
+		public virtual void GameBackForeground() => IsGamePause = false;
 
 		public void DUpdate(float dt)
 		{
-			if (isGamePause)
+			if (IsGamePause)
 			{
-				Delt = 0;
+				GameTimer.Update(0);
 				return;
 			}
 
-			Delt = dt * Scale;
-			ClientSecD += Delt;
+			GameTimer.Update(dt);
 		}
-
-
-		public void SetTimeScale(float scale) => Scale = scale;
 
 		public void SyncCenterTime(DateTime centerDate)
 		{

@@ -120,5 +120,7 @@ namespace DingFrame.Utils
 			sb.Append(s.ToString("00")).Append(sunit);
 			return sb.ToString();
 		}
+	
+		public static float SafeDivide(float a, float b, float NaNValue = 0) => Math.Abs(b) < 0.0001f ? NaNValue : a / b;
 	}
 }

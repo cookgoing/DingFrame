@@ -18,7 +18,7 @@ namespace DingFrame.Module.Event
 	{
 		private Order scheduleOrder = Order.CreateOrder(FrameConfigure.SCHEDULE_DEFAULT_ORDER);
 		public Order ScheduleOrder => scheduleOrder;
-		private TimeModule timeSpace;
+		private GameTimer timeSpace;
 		private double nextExcuteSec;
 		public float DelySec { get; private set; }
 		public int LoopCount { get; private set; }
@@ -27,10 +27,10 @@ namespace DingFrame.Module.Event
 
 		public bool IsInfiniteLoop => LoopCount == -1;
 
-		public ScheduleInfo(TimeModule _timeSpace, float delySec, int loopCount, float intervalSec, Action ev)
+		public ScheduleInfo(GameTimer _timeSpace, float delySec, int loopCount, float intervalSec, Action ev)
 		{
 			timeSpace = _timeSpace;
-			nextExcuteSec = _timeSpace.ClientSecD + delySec;
+			nextExcuteSec = _timeSpace.TimerSecD + delySec;
 			DelySec = delySec;
 			LoopCount = loopCount;
 			IntervalSec = intervalSec;
@@ -49,11 +49,11 @@ namespace DingFrame.Module.Event
 		internal bool Excute()
 		{
 			if (LoopCount == 0) return true;
-			if (timeSpace.ClientSecD < nextExcuteSec) return false;
+			if (timeSpace.TimerSecD < nextExcuteSec) return false;
 
 			Event?.Invoke();
 
-			nextExcuteSec = timeSpace.ClientSecD + IntervalSec;
+			nextExcuteSec = timeSpace.TimerSecD + IntervalSec;
 
 			if (!IsInfiniteLoop) LoopCount--;
 			return LoopCount == 0;
@@ -76,7 +76,6 @@ namespace DingFrame.Module.Event
 			UpdateCollector.Instance.RemoveUpdater(this);
 		}
 
-
 		public void DUpdate(float dt)
 		{
 			if (Schedules == null || Schedules.Count == 0) return;
@@ -84,9 +83,7 @@ namespace DingFrame.Module.Event
 			Schedules.RemoveWhere(info => info.Excute());
 		}
 
-
 		public bool AddSchedule(ScheduleInfo info) => Schedules.Add(info);
-
 		public bool RemoveSchedule(ScheduleInfo info)
 		{
 			if (info == null) return false;
@@ -94,16 +91,15 @@ namespace DingFrame.Module.Event
 			return Schedules.Remove(info);
 		}
 
-		public ScheduleInfo AddSchedule(Action ev, float delySec = 0, int loopCount = -1, float intervalSec = 0.02f, TimeModule timeSpace = null)
+		public ScheduleInfo AddSchedule(Action ev, float delySec = 0, int loopCount = -1, float intervalSec = 0.02f, GameTimer? timeSpace = null)
 		{
-			if (timeSpace == null) timeSpace = ModuleCollector.GetModule<TimeModule>();
+			timeSpace ??= ModuleCollector.GetModule<TimeModule>().GameTimer;
 
-			ScheduleInfo info = new ScheduleInfo(timeSpace, delySec, loopCount, intervalSec, ev);
+			ScheduleInfo info = new ScheduleInfo(timeSpace.Value, delySec, loopCount, intervalSec, ev);
 			bool isAdd = AddSchedule(info);
 
 			return isAdd ? info : null;
 		}
-
 		public int RemoveSchedule(Action ev) => Schedules.RemoveWhere(info => info.Event == ev);
 	}
 }

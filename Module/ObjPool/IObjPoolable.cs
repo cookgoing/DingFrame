@@ -57,7 +57,11 @@ namespace DingFrame.Module.ObjPool
 		public virtual bool Back(T obj)
 		{
 			if (obj == null) return false;
-			if (pool.Count >= MaxCount) return false;
+			if (pool.Count >= MaxCount)
+			{
+				obj.OnWillDestroy();
+				return false;
+			}
 
 			obj.OnWillDespawn();
 			pool.Enqueue(obj);

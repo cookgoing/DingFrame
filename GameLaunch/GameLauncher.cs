@@ -4,11 +4,12 @@ namespace DingFrame.GameLaunch
 	using UnityEngine;
 	using DingFrame;
 	using DingFrame.Module;
+	using DingFrame.Module.Time;
 
 	public sealed class GameLauncher : MonoBehaviour
 	{
 		public ScriptableObject BusinessEntrance;
-
+		private TimeModule timeModule;
 
 		private void Awake()
 		{
@@ -25,6 +26,10 @@ namespace DingFrame.GameLaunch
 
 			if (BusinessEntrance == null || BusinessEntrance is not ILauncherListener businessLancher) throw new Exception("[GameManager] no BusinessEntrance. the game can not running.");
 
+			timeModule = new TimeModule();
+			timeModule.SyncCenterTime(DateTime.UtcNow);
+			ModuleCollector.Instance.AddModule(timeModule);
+
 			businessLancher.OnGameLaunch();
 			ModuleCollector.Instance.ForEach(m => m.Init());
 		}
@@ -36,13 +41,13 @@ namespace DingFrame.GameLaunch
 		}
 
 
-		private void FixedUpdate() => UpdateCollector.Instance.ForEach(updater => updater.DFixedUpdate(Time.fixedDeltaTime));
+		private void FixedUpdate() => UpdateCollector.Instance.ForEach(updater => updater.DFixedUpdate(Time.fixedDeltaTime * timeModule.GameTimer.Scale));
 		private void Update()
 		{
-			UpdateCollector.Instance.ForEach(updater => updater.DUpdate(Time.deltaTime));
+			UpdateCollector.Instance.ForEach(updater => updater.DUpdate(Time.deltaTime * timeModule.GameTimer.Scale));
 			DLogger.DoLog();
 		} 
-		private void LateUpdate() => UpdateCollector.Instance.ForEach(updater => updater.DLateUpdate(Time.deltaTime));
+		private void LateUpdate() => UpdateCollector.Instance.ForEach(updater => updater.DLateUpdate(Time.deltaTime * timeModule.GameTimer.Scale));
 
 
 		private void OnApplicationPause(bool pauseStatus)
@@ -63,6 +68,7 @@ namespace DingFrame.GameLaunch
 		{
 			GameStateListenerCollector.Instance.ForEach(listener => listener.GameQuit());
 			LogRecorder.OnAppExit();
+			Application.logMessageReceivedThreaded -= LogMessageReceivedThreaded;
 		}
 
 

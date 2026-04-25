@@ -15,8 +15,13 @@ namespace DingFrame
 	public sealed class UpdateCollector : Singleton<UpdateCollector>
 	{
 		internal SortedSet<IUpdateCaller> UpdaterCallers { get; private set; }
+		private readonly List<IUpdateCaller> _cache;
 
-		public UpdateCollector() => UpdaterCallers = new SortedSet<IUpdateCaller>(new UpdateComparer());
+		public UpdateCollector()
+		{
+			UpdaterCallers = new SortedSet<IUpdateCaller>(new UpdateComparer());
+			_cache = new (128);
+		}
 
 		public void AddUpdater(IUpdateCaller updater) => UpdaterCallers.Add(updater);
 		public bool RemoveUpdater(IUpdateCaller updater) => UpdaterCallers.Remove(updater);
@@ -29,7 +34,9 @@ namespace DingFrame
 				return;
 			}
 
-			foreach (IUpdateCaller caller in UpdaterCallers) action(caller);
+			_cache.Clear();
+    		_cache.AddRange(UpdaterCallers);
+			foreach (IUpdateCaller caller in _cache) action(caller);
 		}
 	}
 }
