@@ -6,8 +6,10 @@ namespace DingFrame.Utils
 	using UnityEngine;
 	using UnityEngine.Networking;
 	using UnityEngine.UIElements;
+	using UnityEngine.Events;
 
-	public struct FrameEventArg { }
+	public struct TKUIFrameEventArg { }
+	public struct UUIFrameEventArg { }
 
 	public static class MonoUtils
 	{
@@ -19,8 +21,37 @@ namespace DingFrame.Utils
 			foreach (T com in components) UnityEngine.Object.Destroy(com);
 			return true;
 		}
+		public static T AddComponentIfNo<T>(this GameObject gameObject) where T : Component
+		{
+			if (!gameObject.TryGetComponent<T>(out var t)) t = gameObject.AddComponent<T>();
+			
+			return t;
+		}
 
-		public static T AddComponentIfNo<T>(this GameObject gameObject) where T : Component => gameObject.GetComponent<T>() ?? gameObject.AddComponent<T>();
+		public static void ClearItems(this Transform parent, Action<GameObject> Iterate = null)
+		{
+			for (int i = parent.childCount - 1; i >= 0; i--)
+			{
+				GameObject obj = parent.GetChild(i).gameObject;
+				Iterate?.Invoke(obj);
+				UnityEngine.Object.Destroy(obj);
+			}
+		}
+
+		public static void StretchToParent(this RectTransform rt)
+		{
+			if (rt == null || rt.parent == null) return;
+
+			rt.anchorMin = Vector2.zero;
+			rt.anchorMax = Vector2.one;
+
+			rt.offsetMin = Vector2.zero;
+			rt.offsetMax = Vector2.zero;
+
+			rt.anchoredPosition = Vector2.zero;
+			rt.localRotation = Quaternion.identity;
+			rt.localScale = Vector3.one;
+		}
 
 		public static Color Str2Color(string colorStr)
 		{
@@ -31,16 +62,18 @@ namespace DingFrame.Utils
 		public static string Color2Str(Color color) => ColorUtility.ToHtmlStringRGB(color);
 
 
-		public static EventCallback<TEventType> WrapEventCallback<TEventType>(EventCallback<TEventType, FrameEventArg> evt, bool stopPropagation) where TEventType : EventBase<TEventType>, new()
+		public static EventCallback<TEventType> WrapEventCallback<TEventType>(EventCallback<TEventType, TKUIFrameEventArg> evt, bool stopPropagation) where TEventType : EventBase<TEventType>, new()
 		{
 			return et =>
 			{
 				if (stopPropagation) et.StopPropagation();
 
-				evt(et, new FrameEventArg());
+				evt(et, new TKUIFrameEventArg());
 			};
 		}
 
+		public static UnityAction WrapBtnClick(Action<UUIFrameEventArg> action) => () => action(new UUIFrameEventArg());
+		public static UnityAction WrapBtnSelected(Action<UUIFrameEventArg> action) => () => action(new UUIFrameEventArg());
 
 		public static void ForceTKScrollViewUpdateSize(ScrollView view)
 		{
@@ -178,6 +211,18 @@ namespace DingFrame.Utils
 			{
 				Debug.LogError($"[DownloadTexture] has error. {MiscUtils.ExceptionStr(e)}");
 				return (true, null);
+			}
+		}
+	
+		public static async void Forget(this Task task)
+		{
+			try
+			{
+				await task;
+			}
+			catch (Exception e)
+			{
+				Debug.LogException(e);
 			}
 		}
 	}

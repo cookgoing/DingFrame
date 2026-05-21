@@ -8,15 +8,11 @@ namespace DingFrame.Module.Time
 		GameTimer Timer {get;}
 		float Scale {get;}
 
-		new virtual void DFixedUpdate(float dt) => TFixedUpdate(dt * Timer.Scale * Scale);
-		new virtual void DUpdate(float dt) => TUpdate(dt * Timer.Scale * Scale);
-		new virtual void DLateUpdate(float dt) => TLateUpdate(dt * Timer.Scale * Scale);
+		virtual void TFixedUpdate(float dt) {}
+		virtual void TUpdate(float dt) {}
+		virtual void TLateUpdate(float dt) {}
 
-		void TFixedUpdate(float dt);
-		void TUpdate(float dt);
-		void TLateUpdate(float dt);
-
-		void SetTimeScale(float scale);
+		virtual void SetTimeScale(float scale) {}
 	}
 
 	public abstract class TimeScalable : ITimeScalable

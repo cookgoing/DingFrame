@@ -12,5 +12,7 @@ namespace DingFrame
 			_instance = new T(); 
 			return _instance;
 		}
+
+		public static void DeleteInstance() => _instance = null;
 	}
 }

@@ -67,7 +67,7 @@ namespace DingFrame.Module.Context
 			CurContext = context;
 			await CurContext.EnterAsync(preContext, args);
 
-			ModuleCollector.GetModule<EventModule>().Trigger(FrameEventKey.ChangeContext, new object[]{preContext, CurContext});
+			ModuleCollector.GetModule<EventModule>().Trigger(FrameEventKey.ContextChanged, new object[]{preContext, CurContext});
 		}
 	
 		public async Task MoveToContextAsync<T>(params object[] args) where T : IContext

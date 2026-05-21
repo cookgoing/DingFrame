@@ -1,6 +1,7 @@
 namespace DingFrame.GameLaunch
 {
 	using System;
+	using System.Threading.Tasks;
 	using UnityEngine;
 	using DingFrame;
 	using DingFrame.Module;
@@ -13,6 +14,7 @@ namespace DingFrame.GameLaunch
 
 		private void Awake()
 		{
+			TaskScheduler.UnobservedTaskException += UnobservedTaskException;
 			Application.logMessageReceivedThreaded += LogMessageReceivedThreaded;
 			Application.wantsToQuit += ApplicationWantsToQuit;
 			LogRecorder.ClearExpiredLog();
@@ -37,7 +39,9 @@ namespace DingFrame.GameLaunch
 		private void OnDestroy()
 		{
 			ModuleCollector.Instance.ForEach(m => m.Dispose());
+			TaskScheduler.UnobservedTaskException -= UnobservedTaskException;
 			Application.logMessageReceivedThreaded -= LogMessageReceivedThreaded;
+			Application.wantsToQuit -= ApplicationWantsToQuit;
 		}
 
 
@@ -72,13 +76,13 @@ namespace DingFrame.GameLaunch
 		}
 
 
+		private void UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e) => DLogger.Exception(e.Exception);
 		private void LogMessageReceivedThreaded(string condition, string stackTrace, LogType type)
 		{
 			if (type == LogType.Log) return;
 
 			LogRecorder.RecordLog($"{condition}\n{stackTrace}", type);
 		}
-
 		private bool ApplicationWantsToQuit() => GameStateListenerCollector.Instance.AppWantQuit();
 	}
 }

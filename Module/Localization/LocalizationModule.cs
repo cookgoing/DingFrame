@@ -62,7 +62,7 @@ namespace DingFrame.Module.Localization
 			if (preLanguageId.HasValue) await handler?.ReleaseLanguageFile(preLanguageId.Value);
 			await handler?.LoadLanguageFile(LanguageId.Value);
 
-			ModuleCollector.GetModule<EventModule>().Trigger(FrameEventKey.ChangeLanguage, new object[] { preLanguageId, LanguageId });
+			ModuleCollector.GetModule<EventModule>().Trigger(FrameEventKey.LanguageChanged, new object[] { preLanguageId, LanguageId });
 			return true;
 		}
 	}
