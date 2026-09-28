@@ -11,8 +11,9 @@ namespace DingFrame.GameLaunch
 	{
 		public ScriptableObject BusinessEntrance;
 		private TimeModule timeModule;
+		private Task awakeTask;
 
-		private void Awake()
+		private async void Awake()
 		{
 			TaskScheduler.UnobservedTaskException += UnobservedTaskException;
 			Application.logMessageReceivedThreaded += LogMessageReceivedThreaded;
@@ -32,10 +33,16 @@ namespace DingFrame.GameLaunch
 			timeModule.SyncCenterTime(DateTime.UtcNow);
 			ModuleCollector.Instance.AddModule(timeModule);
 
-			businessLancher.OnGameLaunch();
+			awakeTask = businessLancher.OnGameLaunch();
+			await awakeTask;
+			
 			ModuleCollector.Instance.ForEach(m => m.Init());
 		}
-		private void Start() => GameStateListenerCollector.Instance.ForEach(listener => listener.GameEnter());
+		private async void Start()
+		{
+			await awakeTask;
+			GameStateListenerCollector.Instance.ForEach(listener => listener.GameEnter());
+		}
 		private void OnDestroy()
 		{
 			ModuleCollector.Instance.ForEach(m => m.Dispose());

@@ -29,6 +29,7 @@ namespace DingFrame.Module.ObjPool
 		public virtual int MaxCount {get; }
 
 		protected Queue<T> pool;
+		protected HashSet<T> outer;
 		protected Func<Task<T>> createFunc;
 
 		public object GetObj() => Get().Result;
@@ -36,8 +37,10 @@ namespace DingFrame.Module.ObjPool
 		public virtual void Clean()
 		{
 			while(pool.Count > 0) pool.Dequeue()?.OnWillDestroy();
+			foreach (T obj in outer) obj.OnWillDestroy();
 
 			pool.Clear();
+			outer.Clear();
 		}
 		
 		public virtual async Task<T> Get()
@@ -47,11 +50,14 @@ namespace DingFrame.Module.ObjPool
 			{
 				obj = pool.Dequeue();
 				obj.OnSpawned();
-				return obj;
+				goto End;
 			}
 			
 			obj = createFunc != null ? await createFunc() : default;
 			obj?.OnCreated();
+
+		End:
+			outer.Add(obj);
 			return obj;
 		}
 		public virtual bool Back(T obj)
@@ -60,11 +66,13 @@ namespace DingFrame.Module.ObjPool
 			if (pool.Count >= MaxCount)
 			{
 				obj.OnWillDestroy();
+				outer.Remove(obj);
 				return false;
 			}
 
 			obj.OnWillDespawn();
 			pool.Enqueue(obj);
+			outer.Remove(obj);
 			return true;
 		}
 	}

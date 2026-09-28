@@ -31,13 +31,13 @@ namespace DingFrame.Module.UUI
 		public Dictionary<IView, ViewHandler> UIHandlerDic{get; private set;}
 		public Dictionary<IView, IView> BGDic{get; private set;}//<view, bgView>
 
-		public static UUIModule Create()
+		public static async Task<UUIModule> Create()
 		{
 			UUIModule module = new();
-			module.CreateUIObj();
+			await module.CreateUIObj();
 			return module;
 		}
-		private async void CreateUIObj()
+		private async Task CreateUIObj()
 		{
 			string path = "Assets/AARes/ui_common/prefabs/UIModule.prefab";
 			GameObject uiObj = await Addressables.InstantiateAsync(path).Task;
@@ -299,7 +299,7 @@ namespace DingFrame.Module.UUI
 				return null;
 			}
 
-			GameObject obj = await Addressables.InstantiateAsync(metaInfo.Path, layerTransform).Task;
+			GameObject obj = await Addressables.InstantiateAsync(metaInfo.Path, Vector2.one * 1000, Quaternion.identity, layerTransform).Task;
 			try
 			{
 				UILayer layer = metaInfo.Layer;
@@ -308,6 +308,7 @@ namespace DingFrame.Module.UUI
 				view.Attach(obj.transform);
 				canvas.overrideSorting = true;
 				canvas.sortingOrder = metaInfo.Order;
+				obj.transform.localPosition = Vector2.zero;// 初始状态可能不对，所以在外面加载完，再进来
 
 				if (!CreatedView.TryGetValue(layer, out List<IView> viewList))
 				{
@@ -429,7 +430,7 @@ namespace DingFrame.Module.UUI
 		{
 			if (view?.State != ViewState.Closed)
 			{
-				DLogger.Error($"HandleOpenView failed. view state: {view?.State}");
+				DLogger.Error($"HandleOpenView failed. view state: {view?.State}; view:{view?.GetType()}");
 				return false;
 			}
 
@@ -468,7 +469,7 @@ namespace DingFrame.Module.UUI
 		{
 			if (aniView?.AniState != ViewAniState.Idle)
 			{
-				DLogger.Error($"HandleCloseAniView failed. Ani state: {aniView?.AniState}");
+				DLogger.Error($"HandleCloseAniView failed. Ani state: {aniView?.AniState}; aniView: {aniView.GetType()}");
 				return false;
 			}
 
