@@ -109,15 +109,26 @@ namespace DingFrame.Utils
 			else return _byte.ToString("0.##") + "B";
 		}
 	
-		public static string FormatTimeHMS(int sec, char hunit = ':', char munit = ':', char? sunit = null)
+		public static string FormatTimeHMS(long sec, char hunit = ':', char munit = ':', char? sunit = null)
 		{
-			int h = sec / 3600;
-			int m = sec % 3600 / 60;
-			int s = sec % 60;
+			long h = sec / 3600;
+			long m = sec % 3600 / 60;
+			long s = sec % 60;
 			StringBuilder sb = new();
 			if (h > 0) sb.Append(h).Append(hunit);
 			sb.Append(m).Append(munit);
 			sb.Append(s.ToString("00")).Append(sunit);
+			return sb.ToString();
+		}
+		public static string FormatTimeMSMS(long milliSec, char munit = ':', char sunit = '.', char? unit = null)
+		{
+			long m = milliSec / 60_000;
+			long s = milliSec % 60_000 / 1000;
+			long ms = milliSec % 1000;
+			StringBuilder sb = new();
+			sb.Append(m).Append(munit);
+			sb.Append(s.ToString("00")).Append(sunit);
+			sb.Append(ms.ToString("000")).Append(unit);
 			return sb.ToString();
 		}
 	
